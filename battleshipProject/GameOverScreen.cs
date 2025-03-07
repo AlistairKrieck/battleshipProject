@@ -15,6 +15,21 @@ namespace battleshipProject
         public GameOverScreen()
         {
             InitializeComponent();
+
+            if (GameScreen.turn == "playerWon")
+            {
+                winLabel.Text = "Player Won!";
+            }
+
+            else if (GameScreen.turn == "enemyWon")
+            {
+                winLabel.Text = "Enemy Won!";
+            }
+        }
+
+        private void restartButton_Click(object sender, EventArgs e)
+        {
+            Form1.ChangeScreen(this, new MenuScreen());
         }
     }
 }

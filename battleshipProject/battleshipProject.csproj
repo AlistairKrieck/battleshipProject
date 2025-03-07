@@ -86,6 +86,9 @@
     <EmbeddedResource Include="BoardSetupScreen.resx">
       <DependentUpon>BoardSetupScreen.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GameOverScreen.resx">
+      <DependentUpon>GameOverScreen.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GameScreen.resx">
       <DependentUpon>GameScreen.cs</DependentUpon>
     </EmbeddedResource>

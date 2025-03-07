@@ -11,6 +11,11 @@ namespace battleshipProject
         public List<Tile> Tiles;
         public int x, y, width, height, tileSize;
 
+        public Grid()
+        {
+
+        }
+
         public Grid(int _x, int _y, int _width, int _height, int _tileSize)
         {
             x = _x;

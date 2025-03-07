@@ -98,7 +98,15 @@ namespace battleshipProject
 
         private void confirmButton_Click(object sender, EventArgs e)
         {
-            Form1.ChangeScreen(this, new GameScreen());
+            if (littleGuyCount == maxLittleGuyCount)
+            {
+                Form1.ChangeScreen(this, new GameScreen());
+            }
+
+            else
+            {
+                confirmButton.Text = "Not all ships placed!";
+            }
         }
 
         private void removeButton_Click(object sender, EventArgs e)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,8 +14,10 @@ namespace battleshipProject
 {
     public partial class GameScreen : UserControl
     {
-        Grid enemyBoard;
+        Grid enemyBoard = new Grid();
         Grid yourBoard;
+
+        Stopwatch timer = new Stopwatch();
 
         int boardWidth = 10;
         int boardHeight = 10;
@@ -22,20 +25,26 @@ namespace battleshipProject
 
         Random rand = new Random();
 
-        string turn = "player";
+        public static string turn = "player";
 
         public GameScreen()
         {
             InitializeComponent();
-            MakeEnemyBoard();
-            MakePlayerBoard();
+            GameInit();
         }
 
         public void MakeEnemyBoard()
         {
             int x = (this.Width / 4) - (boardWidth * tileSize / 2);
             int y = (this.Height / 2) - (boardHeight * tileSize / 2);
+
             enemyBoard = new Grid(x, y, boardWidth, boardHeight, tileSize);
+
+            foreach (var t in enemyBoard.Tiles)
+            {
+                t.isShip = false;
+                t.wasGuessed = false;
+            }
 
             int j, k;
 
@@ -77,23 +86,32 @@ namespace battleshipProject
             }
         }
 
+        public void GameInit()
+        {
+            turn = "player";
+
+            MakeEnemyBoard();
+            MakePlayerBoard();
+        }
         private void GameScreen_MouseClick(object sender, MouseEventArgs e)
         {
-            int mouseX = e.X;
-            int mouseY = e.Y;
-            int tileSize = enemyBoard.tileSize;
-            Tile clickedTile;
-
-
-            clickedTile = enemyBoard.Tiles.Find(t => mouseX >= t.x && mouseX <= t.x + t.size
-                        && mouseY >= t.y && mouseY <= t.y + t.size);
-
-            if (clickedTile != null)
+            if (turn == "player")
             {
-                clickedTile.wasGuessed = true;
-            }
+                int mouseX = e.X;
+                int mouseY = e.Y;
+                int tileSize = enemyBoard.tileSize;
+                Tile clickedTile;
 
-            turn = "bot";
+
+                clickedTile = enemyBoard.Tiles.Find(t => mouseX >= t.x && mouseX <= t.x + t.size
+                            && mouseY >= t.y && mouseY <= t.y + t.size);
+
+                if (clickedTile != null && clickedTile.wasGuessed == false)
+                {
+                    clickedTile.wasGuessed = true;
+                    turn = "bot";
+                }
+            }
         }
 
         private void RunCPU()
@@ -148,24 +166,56 @@ namespace battleshipProject
 
         private void gameTimer_Tick(object sender, EventArgs e)
         {
+            int enemyShips = CheckRemainingShips(true);
+            int playerShips = CheckRemainingShips(false);
+
+            enemyShipLabel.Text = $"Remaining: {enemyShips}";
+            playerShipLabel.Text = $"Remaining: {playerShips}";
+
             if (turn == "bot")
             {
                 botLabel.Text = "Bot Thinking...";
 
                 Refresh();
-                Thread.Sleep(1000);
+
+                Wait(1000); //Create illusion of thought
 
                 RunCPU();
             }
-            else
+            else if (turn == "player")
             {
                 botLabel.Text = "Your Move!";
             }
+            else
+            {
+                gameTimer.Stop();
+                Form1.ChangeScreen(this, new GameOverScreen());
+            }
 
-            enemyShipLabel.Text = $"Remaining: {CheckRemainingShips(true)}";
-            playerShipLabel.Text = $"Remaining: {CheckRemainingShips(false)}";
+            if (enemyShips == 0)
+            {
+                turn = "playerWon";
+            }
+
+            else if (playerShips == 0)
+            {
+                turn = "enemyWon";
+            }
+
 
             Refresh();
+        }
+
+        public void Wait(int waitTime)
+        {
+            timer.Start();
+
+            while (timer.ElapsedMilliseconds < waitTime)
+            {
+                //wait
+            }
+
+            timer.Reset();
         }
 
         private void GameScreen_Paint(object sender, PaintEventArgs e)
@@ -176,12 +226,15 @@ namespace battleshipProject
                 {
                     e.Graphics.FillRectangle(Form1.missBrush, t.x, t.y, t.size, t.size);
                 }
-                else if (t.wasGuessed == true && t.isShip == true)
+                else if (t.wasGuessed == false && t.isShip == true)
                 {
                     e.Graphics.FillRectangle(Form1.hitBrush, t.x, t.y, t.size, t.size);
                 }
 
-                e.Graphics.DrawRectangle(Form1.tilePen, t.x, t.y, t.size, t.size);
+                else
+                {
+                    e.Graphics.DrawRectangle(Form1.tilePen, t.x, t.y, t.size, t.size);
+                }
             }
 
 
