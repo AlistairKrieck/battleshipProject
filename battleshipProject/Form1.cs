@@ -12,6 +12,11 @@ namespace battleshipProject
 {
     public partial class Form1 : Form
     {
+        public static Pen tilePen = new Pen(Color.White);
+        public static SolidBrush shipBrush = new SolidBrush(Color.Black);
+        public static SolidBrush hitBrush = new SolidBrush(Color.Red);
+        public static SolidBrush missBrush = new SolidBrush(Color.Gray);
+
         public Form1()
         {
             InitializeComponent();
@@ -25,13 +30,13 @@ namespace battleshipProject
 
             if (sender is Form)
             {
-                f = (Form)sender;       
+                f = (Form)sender;
             }
             else
             {
                 UserControl current = (UserControl)sender;
-                f = current.FindForm();                     
-                f.Controls.Remove(current);                 
+                f = current.FindForm();
+                f.Controls.Remove(current);
             }
 
             next.Location = new Point((f.ClientSize.Width - next.Width) / 2,
