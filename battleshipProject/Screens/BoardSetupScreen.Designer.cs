@@ -34,6 +34,7 @@
             this.shipList = new System.Windows.Forms.Label();
             this.littleGuyButton = new System.Windows.Forms.Button();
             this.removeButton = new System.Windows.Forms.Button();
+            this.twoByOneButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // gameTimer
@@ -80,11 +81,22 @@
             this.removeButton.UseVisualStyleBackColor = true;
             this.removeButton.Click += new System.EventHandler(this.removeButton_Click);
             // 
+            // twoByOneButton
+            // 
+            this.twoByOneButton.Location = new System.Drawing.Point(35, 118);
+            this.twoByOneButton.Name = "twoByOneButton";
+            this.twoByOneButton.Size = new System.Drawing.Size(94, 59);
+            this.twoByOneButton.TabIndex = 4;
+            this.twoByOneButton.Text = "2 x 1";
+            this.twoByOneButton.UseVisualStyleBackColor = true;
+            this.twoByOneButton.Click += new System.EventHandler(this.twoByOneButton_Click);
+            // 
             // BoardSetupScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
+            this.Controls.Add(this.twoByOneButton);
             this.Controls.Add(this.removeButton);
             this.Controls.Add(this.littleGuyButton);
             this.Controls.Add(this.shipList);
@@ -105,5 +117,6 @@
         private System.Windows.Forms.Label shipList;
         private System.Windows.Forms.Button littleGuyButton;
         private System.Windows.Forms.Button removeButton;
+        private System.Windows.Forms.Button twoByOneButton;
     }
 }

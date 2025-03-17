@@ -18,7 +18,7 @@ namespace battleshipProject
         int maxLittleGuyCount = 5;
         int littleGuyCount = 0;
 
-
+        List<Button> buttonList = new List<Button>();
 
         public BoardSetupScreen()
         {
@@ -34,6 +34,10 @@ namespace battleshipProject
             int x = (this.Width / 2) - (Form1.boardWidth * Form1.tileSize / 2);
             int y = (this.Height / 2) - (Form1.boardHeight * Form1.tileSize / 2);
             playerBoard = new Grid(x, y, Form1.boardWidth, Form1.boardHeight, Form1.tileSize);
+
+            buttonList.Add(littleGuyButton);
+            buttonList.Add(removeButton);
+            buttonList.Add(twoByOneButton);
         }
 
         private void gameTimer_Tick(object sender, EventArgs e)
@@ -53,18 +57,11 @@ namespace battleshipProject
             {
                 if (t.isShip == true)
                 {
-                    e.Graphics.FillRectangle(Form1.shipBrush, t.x, t.y, t.size, t.size);
+                    e.Graphics.FillRectangle(t.shipType.shipBrush, t.x, t.y, t.size, t.size);
                 }
 
                 e.Graphics.DrawRectangle(Form1.tilePen, t.x, t.y, t.size, t.size);
             }
-        }
-
-        private void littleGuyButton_Click(object sender, EventArgs e)
-        {
-            selectedShip = "littleGuy";
-            littleGuyButton.BackColor = Color.SkyBlue;
-            removeButton.BackColor = Color.White;
         }
 
         private void BoardSetupScreen_MouseClick(object sender, MouseEventArgs e)
@@ -82,6 +79,7 @@ namespace battleshipProject
                 if (clickedTile.isShip == false)
                 {
                     clickedTile.isShip = true;
+                    clickedTile.shipType = new LittleGuy();
                     littleGuyCount++;
                 }
             }
@@ -89,6 +87,7 @@ namespace battleshipProject
             else if (clickedTile.isShip == true)
             {
                 clickedTile.isShip = false;
+                clickedTile.shipType = null;
                 littleGuyCount--;
             }
         }
@@ -109,8 +108,42 @@ namespace battleshipProject
         private void removeButton_Click(object sender, EventArgs e)
         {
             selectedShip = "remove";
+
+            Button unclickedButton = buttonList.Find(t => t.BackColor == Color.SkyBlue);
+
+            if (unclickedButton != null)
+            {
+                unclickedButton.BackColor = Color.White;
+            }
             removeButton.BackColor = Color.SkyBlue;
-            littleGuyButton.BackColor = Color.White;
+        }
+
+        private void twoByOneButton_Click(object sender, EventArgs e)
+        {
+            selectedShip = "remove";
+
+
+            Button unclickedButton = buttonList.Find(t => t.BackColor == Color.SkyBlue);
+            if (unclickedButton != null)
+            {
+                unclickedButton.BackColor = Color.White;
+            }
+
+            twoByOneButton.BackColor = Color.SkyBlue;
+        }
+
+        private void littleGuyButton_Click(object sender, EventArgs e)
+        {
+            selectedShip = "littleGuy";
+
+            Button unclickedButton = buttonList.Find(t => t.BackColor == Color.SkyBlue);
+
+            if (unclickedButton != null)
+            {
+                unclickedButton.BackColor = Color.White;
+            }
+
+            littleGuyButton.BackColor = Color.SkyBlue;
         }
     }
 }
