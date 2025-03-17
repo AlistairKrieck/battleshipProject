@@ -20,12 +20,10 @@ namespace battleshipProject
             ySize = _ySize;
         }
 
-        public partial class LittleGuy : Ship
+        public Ship(Tile _tile)
         {
-            Tile _tile = new Tile();
-            string _name = "littleGuy";
-            int _xSize = 2;
-            int _ySize = 1;
+            tile = _tile;
         }
     }
 }
+

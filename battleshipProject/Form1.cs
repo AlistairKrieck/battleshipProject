@@ -17,6 +17,10 @@ namespace battleshipProject
         public static SolidBrush hitBrush = new SolidBrush(Color.Red);
         public static SolidBrush missBrush = new SolidBrush(Color.Gray);
 
+        public static int boardWidth = 10;
+        public static int boardHeight = 10;
+        public static int tileSize = 30;
+
         public Form1()
         {
             InitializeComponent();

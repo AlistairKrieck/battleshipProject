@@ -28,12 +28,12 @@ namespace battleshipProject
 
         public void InitGame()
         {
-            int boardWidth = 10;
-            int boardHeight = 10;
-            int tileSize = 30;
-            int x = (this.Width / 2) - (boardWidth * tileSize / 2);
-            int y = (this.Height / 2) - (boardHeight * tileSize / 2);
-            playerBoard = new Grid(x, y, boardWidth, boardHeight, tileSize);
+            Form1.boardWidth = 10;
+            Form1.boardHeight = 10;
+            Form1.tileSize = 30;
+            int x = (this.Width / 2) - (Form1.boardWidth * Form1.tileSize / 2);
+            int y = (this.Height / 2) - (Form1.boardHeight * Form1.tileSize / 2);
+            playerBoard = new Grid(x, y, Form1.boardWidth, Form1.boardHeight, Form1.tileSize);
         }
 
         private void gameTimer_Tick(object sender, EventArgs e)
@@ -77,9 +77,9 @@ namespace battleshipProject
             clickedTile = playerBoard.Tiles.Find(t => mouseX >= t.x && mouseX <= t.x + t.size
                                         && mouseY >= t.y && mouseY <= t.y + t.size);
 
-            if (selectedShip == "littleGuy" && littleGuyCount < maxLittleGuyCount)
+            if (selectedShip == "littleGuy" && littleGuyCount < maxLittleGuyCount && clickedTile != null)
             {
-                if (clickedTile != null && clickedTile.isShip == false)
+                if (clickedTile.isShip == false)
                 {
                     clickedTile.isShip = true;
                     littleGuyCount++;
@@ -88,11 +88,8 @@ namespace battleshipProject
 
             else if (clickedTile.isShip == true)
             {
-                if (clickedTile != null && clickedTile.isShip == true)
-                {
-                    clickedTile.isShip = false;
-                    littleGuyCount--;
-                }
+                clickedTile.isShip = false;
+                littleGuyCount--;
             }
         }
 
