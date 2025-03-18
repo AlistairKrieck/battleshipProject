@@ -15,8 +15,10 @@ namespace battleshipProject
         public static Grid playerBoard;
 
         string selectedShip = "null";
-        int maxLittleGuyCount = 5;
+        int maxLittleGuyCount = 3;
+        int maxTwoByOneCount = 3;
         int littleGuyCount = 0;
+        int twoByOneCount = 0;
 
         List<Button> buttonList = new List<Button>();
 
@@ -84,12 +86,68 @@ namespace battleshipProject
                 }
             }
 
-            else if (clickedTile.isShip == true)
+            else if (selectedShip == "twoByOne" && twoByOneCount < maxTwoByOneCount && clickedTile != null)
             {
+                if (clickedTile.isShip == false && GetShipParts(clickedTile).isShipPart == false)
+                {
+                    clickedTile.isShip = true;
+                    clickedTile.shipType = new OneByTwoShip();
+                    SetShipParts(clickedTile);
+
+                    twoByOneCount++;
+                }
+            }
+
+            else if (selectedShip == "remove" && clickedTile.isShip == true)
+            {
+                if (clickedTile.shipType.name == "littleGuy")
+                {
+                    littleGuyCount--;
+                }
+
+                else if (clickedTile.shipType.name == "twoByOne" && clickedTile.isShipPart == false)
+                {
+                    twoByOneCount--;
+
+                    playerBoard.Tiles.Find(t => t == GetShipParts(clickedTile)).shipType = null;
+                    playerBoard.Tiles.Find(t => t == GetShipParts(clickedTile)).isShipPart = false;
+                    playerBoard.Tiles.Find(t => t == GetShipParts(clickedTile)).isShip = false;
+                }
+
+                else if (clickedTile.shipType.name == "twoByOne" && clickedTile.isShipPart == true)
+                {
+                    twoByOneCount--;
+
+                    playerBoard.Tiles.Find(t => t == GetMainShip(clickedTile)).shipType = null;
+                    playerBoard.Tiles.Find(t => t == GetMainShip(clickedTile)).isShipPart = false;
+                    playerBoard.Tiles.Find(t => t == GetMainShip(clickedTile)).isShip = false;
+                }
+
                 clickedTile.isShip = false;
                 clickedTile.shipType = null;
-                littleGuyCount--;
             }
+        }
+
+        private void SetShipParts(Tile clickedTile)
+        {
+            Tile shipPart = playerBoard.Tiles.Find(t => t.refX == clickedTile.refX + 1 && t.refY == clickedTile.refY);
+
+            shipPart.isShipPart = shipPart.isShip = true;
+            shipPart.shipType = clickedTile.shipType;
+        }
+
+        private Tile GetShipParts(Tile clickedTile)
+        {
+            Tile shipPart = playerBoard.Tiles.Find(t => t.refX == clickedTile.refX + 1 && t.refY == clickedTile.refY);
+
+            return shipPart;
+        }
+
+        private Tile GetMainShip(Tile clickedTile)
+        {
+            Tile shipPart = playerBoard.Tiles.Find(t => t.refX == clickedTile.refX - 1 && t.refY == clickedTile.refY);
+
+            return shipPart;
         }
 
         private void confirmButton_Click(object sender, EventArgs e)
@@ -120,7 +178,7 @@ namespace battleshipProject
 
         private void twoByOneButton_Click(object sender, EventArgs e)
         {
-            selectedShip = "remove";
+            selectedShip = "twoByOne";
 
 
             Button unclickedButton = buttonList.Find(t => t.BackColor == Color.SkyBlue);
