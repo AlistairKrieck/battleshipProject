@@ -76,64 +76,142 @@ namespace battleshipProject
             clickedTile = playerBoard.Tiles.Find(t => mouseX >= t.x && mouseX <= t.x + t.size
                                         && mouseY >= t.y && mouseY <= t.y + t.size);
 
-            if (selectedShip == "littleGuy" && littleGuyCount < maxLittleGuyCount && clickedTile != null)
+            if (e.Button == MouseButtons.Left && clickedTile != null)
             {
-                if (clickedTile.isShip == false)
+                if (selectedShip == "littleGuy" && littleGuyCount < maxLittleGuyCount)
                 {
-                    clickedTile.isShip = true;
-                    clickedTile.shipType = new LittleGuy();
-                    littleGuyCount++;
+                    if (clickedTile.isShip == false)
+                    {
+                        clickedTile.isShip = true;
+                        clickedTile.isMainShip = true;
+                        clickedTile.shipType = new LittleGuy();
+                        littleGuyCount++;
+                    }
+                }
+
+                else if (selectedShip == "twoByOne" && twoByOneCount < maxTwoByOneCount)
+                {
+                    if (clickedTile.isShip == false && GetShipParts(clickedTile).isShip == false)
+                    {
+                        clickedTile.isShip = true;
+                        clickedTile.isMainShip = true;
+                        clickedTile.shipType = new OneByTwoShip();
+                        SetShipParts(clickedTile);
+
+                        twoByOneCount++;
+                    }
+                }
+
+                else if (selectedShip == "remove" && clickedTile.isShip == true)
+                {
+                    if (clickedTile.shipType.name == "littleGuy")
+                    {
+                        littleGuyCount--;
+                    }
+
+                    else if (clickedTile.shipType.name == "twoByOne" && clickedTile.isShipPart == false)
+                    {
+                        twoByOneCount--;
+
+                        RemoveShipParts(clickedTile);
+                    }
+
+                    else if (clickedTile.shipType.name == "twoByOne" && clickedTile.isShipPart == true)
+                    {
+                        twoByOneCount--;
+
+                        playerBoard.Tiles.Find(t => t == GetOrientation(clickedTile, 2)).shipType = null;
+                        playerBoard.Tiles.Find(t => t == GetOrientation(clickedTile, 2)).isShipPart = false;
+                        playerBoard.Tiles.Find(t => t == GetOrientation(clickedTile, 2)).isShip = false;
+                    }
+
+                    clickedTile.isShip = false;
+                    clickedTile.shipType = null;
                 }
             }
 
-            else if (selectedShip == "twoByOne" && twoByOneCount < maxTwoByOneCount && clickedTile != null)
+            else if (e.Button == MouseButtons.Right && clickedTile != null)
             {
-                if (clickedTile.isShip == false && GetShipParts(clickedTile).isShipPart == false)
+                if (clickedTile.isMainShip == true && clickedTile.shipType.name == "twoByOne")
                 {
-                    clickedTile.isShip = true;
-                    clickedTile.shipType = new OneByTwoShip();
-                    SetShipParts(clickedTile);
-
-                    twoByOneCount++;
+                    RotateShip(clickedTile);
                 }
             }
+        }
 
-            else if (selectedShip == "remove" && clickedTile.isShip == true)
+        private void RotateShip(Tile clickedTile)
+        {
+            clickedTile.shipType.ChangeOrientation(1);
+
+            if (GetOrientation(clickedTile, 0).isShip == false)
             {
-                if (clickedTile.shipType.name == "littleGuy")
-                {
-                    littleGuyCount--;
-                }
+                //clickedTile.shipType.ChangeOrientation(-1);
 
-                else if (clickedTile.shipType.name == "twoByOne" && clickedTile.isShipPart == false)
-                {
-                    twoByOneCount--;
+                RemoveShipParts(clickedTile);
 
-                    playerBoard.Tiles.Find(t => t == GetShipParts(clickedTile)).shipType = null;
-                    playerBoard.Tiles.Find(t => t == GetShipParts(clickedTile)).isShipPart = false;
-                    playerBoard.Tiles.Find(t => t == GetShipParts(clickedTile)).isShip = false;
-                }
+                //clickedTile.shipType.ChangeOrientation(1);
 
-                else if (clickedTile.shipType.name == "twoByOne" && clickedTile.isShipPart == true)
-                {
-                    twoByOneCount--;
-
-                    playerBoard.Tiles.Find(t => t == GetMainShip(clickedTile)).shipType = null;
-                    playerBoard.Tiles.Find(t => t == GetMainShip(clickedTile)).isShipPart = false;
-                    playerBoard.Tiles.Find(t => t == GetMainShip(clickedTile)).isShip = false;
-                }
-
-                clickedTile.isShip = false;
-                clickedTile.shipType = null;
+                SetShipParts(clickedTile);
             }
+
+            else
+            {
+                clickedTile.shipType.ChangeOrientation(-1);
+            }
+        }
+
+        private Tile GetOrientation(Tile clickedTile, int futureCheck)
+        {
+            Tile shipPart = new Tile();
+            int ori = clickedTile.shipType.orientation + futureCheck;
+
+            if (ori == -1)
+            {
+                ori = 3;
+            }
+
+            else if (ori > 3)
+            {
+                ori = 4 - ori;
+            }
+
+            if (ori == 0)
+            {
+                shipPart = playerBoard.Tiles.Find(t => t.refX == clickedTile.refX + 1 && t.refY == clickedTile.refY);
+            }
+
+            else if (ori == 1)
+            {
+                shipPart = playerBoard.Tiles.Find(t => t.refX == clickedTile.refX && t.refY + 1 == clickedTile.refY);
+            }
+
+            else if (ori == 2)
+            {
+                shipPart = playerBoard.Tiles.Find(t => t.refX == clickedTile.refX - 1 && t.refY == clickedTile.refY);
+            }
+
+            else if (ori == 3)
+            {
+                shipPart = playerBoard.Tiles.Find(t => t.refX == clickedTile.refX && t.refY - 1 == clickedTile.refY);
+            }
+
+            return shipPart;
         }
 
         private void SetShipParts(Tile clickedTile)
         {
-            Tile shipPart = playerBoard.Tiles.Find(t => t.refX == clickedTile.refX + 1 && t.refY == clickedTile.refY);
+            Tile shipPart = GetOrientation(clickedTile, 0);
 
             shipPart.isShipPart = shipPart.isShip = true;
             shipPart.shipType = clickedTile.shipType;
+        }
+
+        private void RemoveShipParts(Tile clickedTile)
+        {
+            Tile shipPart = GetOrientation(clickedTile, -1);
+
+            shipPart.isShipPart = shipPart.isShip = false;
+            shipPart.shipType = null;
         }
 
         private Tile GetShipParts(Tile clickedTile)

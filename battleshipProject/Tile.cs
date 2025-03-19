@@ -9,7 +9,7 @@ namespace battleshipProject
     public class Tile
     {
         public int x, y, size, refX, refY;
-        public bool isShip, wasGuessed, isShipPart;
+        public bool isShip, wasGuessed, isShipPart, isMainShip;
         public Ship shipType;
 
         public Tile(int _x, int _y, int _size, int _refX, int _refY)
@@ -20,5 +20,8 @@ namespace battleshipProject
             refX = _refX;
             refY = _refY;
         }
+
+        public Tile()
+        { }
     }
 }

@@ -9,8 +9,6 @@ namespace battleshipProject
 {
     public partial class OneByTwoShip : Ship
     {
-        int orientaion = 0;
-
         public OneByTwoShip()
         {
             name = "twoByOne";
@@ -27,18 +25,6 @@ namespace battleshipProject
             orientaions.Fill(data);
 
             shipBrush = new SolidBrush(Color.Red);
-        }
-
-        public void Rotate()
-        {
-            if (orientaion < 4)
-            {
-                orientaion++;
-            }
-            else
-            {
-                orientaion = 0;
-            }
         }
     }
 }
