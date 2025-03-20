@@ -46,7 +46,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Matrix.cs" />
     <Compile Include="Ships\OneByTwoShip.cs" />
     <Compile Include="Screens\Form1.cs">
       <SubType>Form</SubType>

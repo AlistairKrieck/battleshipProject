@@ -23,6 +23,10 @@ namespace battleshipProject
         int boardHeight = 10;
         int tileSize = 30;
 
+        int littleGuyCount = 3;
+        int twoByOneCount = 3;
+
+
         Random rand = new Random();
 
         public static string turn = "player";
@@ -46,12 +50,10 @@ namespace battleshipProject
                 t.wasGuessed = false;
             }
 
-            int j, k;
-
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < twoByOneCount; i++)
             {
-                j = rand.Next(0, boardWidth);
-                k = rand.Next(0, boardHeight);
+                int j = rand.Next(0, boardWidth);
+                int k = rand.Next(0, boardHeight);
 
                 Tile tile = enemyBoard.Tiles.Find(t => t.refX == j && t.refY == k);
 
@@ -62,6 +64,26 @@ namespace battleshipProject
                 else
                 {
                     tile.isShip = true;
+                    tile.shipType = new OneByTwoShip();
+                    tile.shipType.SetShipParts(tile, enemyBoard);
+                }
+            }
+
+            for (int i = 0; i < littleGuyCount; i++)
+            {
+                int j = rand.Next(0, boardWidth);
+                int k = rand.Next(0, boardHeight);
+
+                Tile tile = enemyBoard.Tiles.Find(t => t.refX == j && t.refY == k);
+
+                if (tile.isShip == true)
+                {
+                    i--;
+                }
+                else
+                {
+                    tile.isShip = true;
+                    tile.shipType = new LittleGuy();
                 }
             }
         }
@@ -137,13 +159,13 @@ namespace battleshipProject
 
         private int CheckRemainingShips(bool checkEnemy)
         {
-            int remainingShips = 5;
+            int remainingShips = littleGuyCount + twoByOneCount;
 
             if (checkEnemy == false)
             {
                 foreach (var t in yourBoard.Tiles)
                 {
-                    if (t.isShip == true && t.wasGuessed == true)
+                    if (t.isShip == true && t.wasGuessed == true && t.isShipPart == false)
                     {
                         remainingShips--;
                     }
@@ -154,7 +176,7 @@ namespace battleshipProject
             {
                 foreach (var t in enemyBoard.Tiles)
                 {
-                    if (t.isShip == true && t.wasGuessed == true)
+                    if (t.isShip == true && t.wasGuessed == true && t.isShipPart == false)
                     {
                         remainingShips--;
                     }

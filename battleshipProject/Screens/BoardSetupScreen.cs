@@ -83,7 +83,6 @@ namespace battleshipProject
                     if (clickedTile.isShip == false)
                     {
                         clickedTile.isShip = true;
-                        clickedTile.isMainShip = true;
                         clickedTile.shipType = new LittleGuy();
                         littleGuyCount++;
                     }
@@ -91,12 +90,11 @@ namespace battleshipProject
 
                 else if (selectedShip == "twoByOne" && twoByOneCount < maxTwoByOneCount)
                 {
-                    if (clickedTile.isShip == false && GetShipParts(clickedTile).isShip == false)
+                    if (clickedTile.isShip == false && Ship.GetOrientation(clickedTile, 0, playerBoard) != null && Ship.GetOrientation(clickedTile, 0, playerBoard).isShip == false)
                     {
                         clickedTile.isShip = true;
-                        clickedTile.isMainShip = true;
                         clickedTile.shipType = new OneByTwoShip();
-                        SetShipParts(clickedTile);
+                        clickedTile.shipType.SetShipParts(clickedTile, playerBoard);
 
                         twoByOneCount++;
                     }
@@ -113,124 +111,39 @@ namespace battleshipProject
                     {
                         twoByOneCount--;
 
-                        RemoveShipParts(clickedTile);
+                        clickedTile.shipType.RemoveShipParts(clickedTile, playerBoard);
                     }
 
                     else if (clickedTile.shipType.name == "twoByOne" && clickedTile.isShipPart == true)
                     {
                         twoByOneCount--;
-
-                        playerBoard.Tiles.Find(t => t == GetOrientation(clickedTile, 2)).shipType = null;
-                        playerBoard.Tiles.Find(t => t == GetOrientation(clickedTile, 2)).isShipPart = false;
-                        playerBoard.Tiles.Find(t => t == GetOrientation(clickedTile, 2)).isShip = false;
+                        Ship.GetOrientation(clickedTile, 2, playerBoard).shipType = null;
+                        Ship.GetOrientation(clickedTile, 2, playerBoard).isShipPart = false;
+                        Ship.GetOrientation(clickedTile, 2, playerBoard).isShip = false;
                     }
 
                     clickedTile.isShip = false;
+                    clickedTile.isShipPart = false;
                     clickedTile.shipType = null;
                 }
             }
 
-            else if (e.Button == MouseButtons.Right && clickedTile != null)
+            else if (e.Button == MouseButtons.Right && clickedTile != null && clickedTile.shipType != null)
             {
-                if (clickedTile.isMainShip == true && clickedTile.shipType.name == "twoByOne")
+                if (clickedTile.isShipPart == false && clickedTile.shipType.name == "twoByOne")
                 {
-                    RotateShip(clickedTile);
+                    try
+                    {
+                        clickedTile.shipType.RotateShip(clickedTile, playerBoard);
+                    }
+                    catch { }
                 }
             }
         }
 
-        private void RotateShip(Tile clickedTile)
-        {
-            clickedTile.shipType.ChangeOrientation(1);
-
-            if (GetOrientation(clickedTile, 0).isShip == false)
-            {
-                //clickedTile.shipType.ChangeOrientation(-1);
-
-                RemoveShipParts(clickedTile);
-
-                //clickedTile.shipType.ChangeOrientation(1);
-
-                SetShipParts(clickedTile);
-            }
-
-            else
-            {
-                clickedTile.shipType.ChangeOrientation(-1);
-            }
-        }
-
-        private Tile GetOrientation(Tile clickedTile, int futureCheck)
-        {
-            Tile shipPart = new Tile();
-            int ori = clickedTile.shipType.orientation + futureCheck;
-
-            if (ori == -1)
-            {
-                ori = 3;
-            }
-
-            else if (ori > 3)
-            {
-                ori = 4 - ori;
-            }
-
-            if (ori == 0)
-            {
-                shipPart = playerBoard.Tiles.Find(t => t.refX == clickedTile.refX + 1 && t.refY == clickedTile.refY);
-            }
-
-            else if (ori == 1)
-            {
-                shipPart = playerBoard.Tiles.Find(t => t.refX == clickedTile.refX && t.refY + 1 == clickedTile.refY);
-            }
-
-            else if (ori == 2)
-            {
-                shipPart = playerBoard.Tiles.Find(t => t.refX == clickedTile.refX - 1 && t.refY == clickedTile.refY);
-            }
-
-            else if (ori == 3)
-            {
-                shipPart = playerBoard.Tiles.Find(t => t.refX == clickedTile.refX && t.refY - 1 == clickedTile.refY);
-            }
-
-            return shipPart;
-        }
-
-        private void SetShipParts(Tile clickedTile)
-        {
-            Tile shipPart = GetOrientation(clickedTile, 0);
-
-            shipPart.isShipPart = shipPart.isShip = true;
-            shipPart.shipType = clickedTile.shipType;
-        }
-
-        private void RemoveShipParts(Tile clickedTile)
-        {
-            Tile shipPart = GetOrientation(clickedTile, -1);
-
-            shipPart.isShipPart = shipPart.isShip = false;
-            shipPart.shipType = null;
-        }
-
-        private Tile GetShipParts(Tile clickedTile)
-        {
-            Tile shipPart = playerBoard.Tiles.Find(t => t.refX == clickedTile.refX + 1 && t.refY == clickedTile.refY);
-
-            return shipPart;
-        }
-
-        private Tile GetMainShip(Tile clickedTile)
-        {
-            Tile shipPart = playerBoard.Tiles.Find(t => t.refX == clickedTile.refX - 1 && t.refY == clickedTile.refY);
-
-            return shipPart;
-        }
-
         private void confirmButton_Click(object sender, EventArgs e)
         {
-            if (littleGuyCount == maxLittleGuyCount)
+            if (littleGuyCount == maxLittleGuyCount && twoByOneCount == maxTwoByOneCount)
             {
                 Form1.ChangeScreen(this, new GameScreen());
             }
