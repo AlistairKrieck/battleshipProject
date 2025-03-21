@@ -12,6 +12,7 @@ namespace battleshipProject
         public string name;
         public int xSize, ySize;
         public SolidBrush shipBrush;
+        public List<Tile> shipParts = new List<Tile>();
         public int orientation = 0;
 
         public void ChangeOrientation(int modifier)

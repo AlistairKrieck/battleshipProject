@@ -39,6 +39,7 @@ namespace battleshipProject
 
         public void MakeEnemyBoard()
         {
+            Random rand = new Random();
             int x = (this.Width / 4) - (boardWidth * tileSize / 2);
             int y = (this.Height / 2) - (boardHeight * tileSize / 2);
 
@@ -47,6 +48,7 @@ namespace battleshipProject
             foreach (var t in enemyBoard.Tiles)
             {
                 t.isShip = false;
+                t.isShipPart = false;
                 t.wasGuessed = false;
             }
 
@@ -55,17 +57,29 @@ namespace battleshipProject
                 int j = rand.Next(0, boardWidth);
                 int k = rand.Next(0, boardHeight);
 
+                int ori = rand.Next(0, 4);
+
+
                 Tile tile = enemyBoard.Tiles.Find(t => t.refX == j && t.refY == k);
 
-                if (tile.isShip == true)
+                if (Ship.GetOrientation(tile, ori, enemyBoard) == null || tile.isShip == true || Ship.GetOrientation(tile, ori, enemyBoard).isShip == true)
                 {
                     i--;
                 }
+
                 else
                 {
-                    tile.isShip = true;
                     tile.shipType = new OneByTwoShip();
+                    tile.shipType.ChangeOrientation(ori);
                     tile.shipType.SetShipParts(tile, enemyBoard);
+
+                    tile.shipType.shipParts.Add(tile);
+                    tile.shipType.shipParts.Add(Ship.GetOrientation(tile, 0, enemyBoard));
+
+                    foreach (var t in tile.shipType.shipParts)
+                    {
+                        t.isShip = true;
+                    }
                 }
             }
 
@@ -84,6 +98,7 @@ namespace battleshipProject
                 {
                     tile.isShip = true;
                     tile.shipType = new LittleGuy();
+                    tile.shipType.shipParts.Add(tile);
                 }
             }
         }
@@ -115,6 +130,7 @@ namespace battleshipProject
             MakeEnemyBoard();
             MakePlayerBoard();
         }
+
         private void GameScreen_MouseClick(object sender, MouseEventArgs e)
         {
             if (turn == "player")
@@ -163,10 +179,17 @@ namespace battleshipProject
 
             if (checkEnemy == false)
             {
-                foreach (var t in yourBoard.Tiles)
+                List<Tile> guessedTiles = yourBoard.Tiles.FindAll(t => t.wasGuessed == true && t.isShip == true);
+
+                for (int i = 0; i < guessedTiles.Count; i++)
                 {
-                    if (t.isShip == true && t.wasGuessed == true && t.isShipPart == false)
+                    if (guessedTiles[i].shipType.shipParts.All(s => s.wasGuessed == true))
                     {
+                        if (guessedTiles[i].shipType.name == "twoByOne")
+                        {
+                            guessedTiles.Remove(guessedTiles[i].shipType.shipParts[guessedTiles[i].shipType.shipParts.Count - 1]);
+                        }
+
                         remainingShips--;
                     }
                 }
@@ -174,10 +197,17 @@ namespace battleshipProject
 
             else
             {
-                foreach (var t in enemyBoard.Tiles)
+                List<Tile> guessedTiles = enemyBoard.Tiles.FindAll(t => t.wasGuessed == true && t.isShip == true);
+
+                for (int i = 0; i < guessedTiles.Count; i++)
                 {
-                    if (t.isShip == true && t.wasGuessed == true && t.isShipPart == false)
+                    if (guessedTiles[i].shipType.shipParts.All(s => s.wasGuessed == true))
                     {
+                        if (guessedTiles[i].shipType.name == "twoByOne")
+                        {
+                            guessedTiles.Remove(guessedTiles[i].shipType.shipParts[guessedTiles[i].shipType.shipParts.Count - 1]);
+                        }
+
                         remainingShips--;
                     }
                 }
