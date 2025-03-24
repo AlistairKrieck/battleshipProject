@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Diagnostics;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
@@ -18,6 +19,9 @@ namespace battleshipProject
         Grid yourBoard;
 
         Stopwatch timer = new Stopwatch();
+
+        SoundPlayer missSoundPlayer = new SoundPlayer(Properties.Resources.missSound);
+        SoundPlayer explosionSoundPlayer = new SoundPlayer(Properties.Resources.explosionSound);
 
         int boardWidth = 10;
         int boardHeight = 10;
@@ -110,7 +114,7 @@ namespace battleshipProject
 
             yourBoard = new Grid(x, y, boardWidth, boardHeight, tileSize);
 
-            List<Tile> tiles = BoardSetupScreen.playerBoard.Tiles.FindAll(t => t.isShip == true);
+            //List<Tile> tiles = BoardSetupScreen.playerBoard.Tiles.FindAll(t => t.isShip == true);
 
             for (int i = 0; i < yourBoard.Tiles.Count; i++)
             {
@@ -119,6 +123,8 @@ namespace battleshipProject
                     && BoardSetupScreen.playerBoard.Tiles[i].isShip == true)
                 {
                     yourBoard.Tiles[i].isShip = BoardSetupScreen.playerBoard.Tiles[i].isShip;
+                    yourBoard.Tiles[i].isShipPart = BoardSetupScreen.playerBoard.Tiles[i].isShipPart;
+                    yourBoard.Tiles[i].shipType = BoardSetupScreen.playerBoard.Tiles[i].shipType;
                 }
             }
         }
@@ -148,6 +154,16 @@ namespace battleshipProject
                 {
                     clickedTile.wasGuessed = true;
                     turn = "bot";
+
+                    if (clickedTile.isShip == true)
+                    {
+                        explosionSoundPlayer.Play();
+
+                    }
+                    else
+                    {
+                        missSoundPlayer.Play();
+                    }
                 }
             }
         }
@@ -165,9 +181,18 @@ namespace battleshipProject
             {
                 goto p;
             }
+            else if (tile.isShip == true && tile.wasGuessed == false)
+            {
+                tile.wasGuessed = true;
+                Tile t = tile.shipType.shipParts.Find(s => s.refX == tile.refX && s.refY == tile.refY);
+                t.wasGuessed = true;
+
+                explosionSoundPlayer.Play();
+            }
             else
             {
                 tile.wasGuessed = true;
+                missSoundPlayer.Play();
             }
 
             turn = "player";
@@ -189,8 +214,11 @@ namespace battleshipProject
                         {
                             guessedTiles.Remove(guessedTiles[i].shipType.shipParts[guessedTiles[i].shipType.shipParts.Count - 1]);
                         }
+                        else
+                        {
+                            remainingShips--;
+                        }
 
-                        remainingShips--;
                     }
                 }
             }
@@ -230,7 +258,7 @@ namespace battleshipProject
 
                 Refresh();
 
-                Wait(1000); //Create illusion of thought
+                Wait(1500); //Create illusion of thought
 
                 RunCPU();
             }
@@ -278,9 +306,9 @@ namespace battleshipProject
                 {
                     e.Graphics.FillRectangle(Form1.missBrush, t.x, t.y, t.size, t.size);
                 }
-                else if (t.wasGuessed == false && t.isShip == true)
+                else if (t.wasGuessed == true && t.isShip == true)
                 {
-                    e.Graphics.FillRectangle(Form1.hitBrush, t.x, t.y, t.size, t.size);
+                    e.Graphics.FillRectangle(t.shipType.hitBrush, t.x, t.y, t.size, t.size);
                 }
 
                 else
@@ -299,7 +327,7 @@ namespace battleshipProject
 
                 else if (t.wasGuessed == true && t.isShip == true)
                 {
-                    e.Graphics.FillRectangle(Form1.hitBrush, t.x, t.y, t.size, t.size);
+                    e.Graphics.FillRectangle(t.shipType.hitBrush, t.x, t.y, t.size, t.size);
                 }
 
                 else if (t.wasGuessed == false && t.isShip == true)

@@ -14,7 +14,6 @@ namespace battleshipProject
     {
         public static Pen tilePen = new Pen(Color.White);
         public static SolidBrush shipBrush = new SolidBrush(Color.Black);
-        public static SolidBrush hitBrush = new SolidBrush(Color.Red);
         public static SolidBrush missBrush = new SolidBrush(Color.Gray);
 
         public static int boardWidth = 10;

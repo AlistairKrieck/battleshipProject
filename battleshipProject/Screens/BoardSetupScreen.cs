@@ -84,6 +84,7 @@ namespace battleshipProject
                     {
                         clickedTile.isShip = true;
                         clickedTile.shipType = new LittleGuy();
+                        clickedTile.shipType.shipParts.Add(clickedTile);
                         littleGuyCount++;
                     }
                 }
@@ -95,6 +96,9 @@ namespace battleshipProject
                         clickedTile.isShip = true;
                         clickedTile.shipType = new OneByTwoShip();
                         clickedTile.shipType.SetShipParts(clickedTile, playerBoard);
+
+                        clickedTile.shipType.shipParts.Add(clickedTile);
+                        clickedTile.shipType.shipParts.Add(Ship.GetOrientation(clickedTile, 0, playerBoard));
 
                         twoByOneCount++;
                     }

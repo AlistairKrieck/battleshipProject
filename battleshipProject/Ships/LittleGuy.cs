@@ -15,6 +15,7 @@ namespace battleshipProject
             int xSize = 1;
             int ySize = 1;
             shipBrush = new SolidBrush(Color.Tan);
+            hitBrush = new SolidBrush(Color.Red);
         }
     }
 }
