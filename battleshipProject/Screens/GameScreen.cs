@@ -15,6 +15,9 @@ namespace battleshipProject
 {
     public partial class GameScreen : UserControl
     {
+        //TODO Add animations
+        Rectangle missile = new Rectangle();
+
         Grid enemyBoard = new Grid();
         Grid yourBoard;
 
@@ -153,7 +156,6 @@ namespace battleshipProject
                 if (clickedTile != null && clickedTile.wasGuessed == false)
                 {
                     clickedTile.wasGuessed = true;
-                    turn = "bot";
 
                     if (clickedTile.isShip == true)
                     {
@@ -164,6 +166,10 @@ namespace battleshipProject
                     {
                         missSoundPlayer.Play();
                     }
+
+                    FireMissileAnimation(clickedTile);
+
+                    turn = "bot";
                 }
             }
         }
@@ -196,6 +202,33 @@ namespace battleshipProject
             }
 
             turn = "player";
+        }
+
+        private void FireMissileAnimation(Tile tile)
+        {
+            int missleSpeed = 10;
+
+            int startX = this.Width / 2;
+            int startY = this.Height;
+
+            int x = startX;
+            int y = startY;
+
+            int endX = tile.x + (tile.size / 2);
+            int endY = tile.y + (tile.size / 2);
+
+            double yStep = Math.Sin(endY - startY) * missleSpeed;
+            double xStep = Math.Cos(endX - startX) * missleSpeed;
+
+            missile = new Rectangle(Convert.ToInt32(x), Convert.ToInt32(y), 10, 10);
+
+            while (missile.X > endX && missile.Y > endY)
+            {
+                missile.X += Convert.ToInt32(xStep);
+                missile.Y += Convert.ToInt32(yStep);
+
+                Refresh();
+            }
         }
 
         private int CheckRemainingShips(bool checkEnemy)
@@ -337,6 +370,8 @@ namespace battleshipProject
 
                 e.Graphics.DrawRectangle(Form1.tilePen, t.x, t.y, t.size, t.size);
             }
+
+            e.Graphics.FillRectangle(new SolidBrush(Color.Brown), missile);
         }
     }
 }
