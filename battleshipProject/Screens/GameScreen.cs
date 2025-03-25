@@ -189,12 +189,11 @@ namespace battleshipProject
             {
                 goto p;
             }
-
-            tile.wasGuessed = true;
-            FireBotMissileAnimation(tile);
-
-            if (tile.isShip == true && tile.wasGuessed == false)
+            else if (tile.isShip == true && tile.wasGuessed == false)
             {
+                tile.wasGuessed = true;
+                FireBotMissileAnimation(tile);
+
                 Tile t = tile.shipType.shipParts.Find(s => s.refX == tile.refX && s.refY == tile.refY);
                 t.wasGuessed = true;
 
@@ -202,7 +201,8 @@ namespace battleshipProject
             }
             else
             {
-
+                tile.wasGuessed = true;
+                FireBotMissileAnimation(tile);
                 missSoundPlayer.Play();
             }
 
@@ -293,11 +293,8 @@ namespace battleshipProject
                         {
                             guessedTiles.Remove(guessedTiles[i].shipType.shipParts[guessedTiles[i].shipType.shipParts.Count - 1]);
                         }
-                        else
-                        {
-                            remainingShips--;
-                        }
 
+                        remainingShips--;
                     }
                 }
             }
