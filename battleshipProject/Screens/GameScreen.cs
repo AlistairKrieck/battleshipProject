@@ -16,7 +16,7 @@ namespace battleshipProject
     public partial class GameScreen : UserControl
     {
         //TODO Add animations
-        Rectangle missile = new Rectangle();
+        PointF[] missleData = new PointF[4];
 
         Grid enemyBoard = new Grid();
         Grid yourBoard;
@@ -155,6 +155,8 @@ namespace battleshipProject
 
                 if (clickedTile != null && clickedTile.wasGuessed == false)
                 {
+                    FirePlayerMissileAnimation(clickedTile);
+
                     clickedTile.wasGuessed = true;
 
                     if (clickedTile.isShip == true)
@@ -167,7 +169,7 @@ namespace battleshipProject
                         missSoundPlayer.Play();
                     }
 
-                    FireMissileAnimation(clickedTile);
+
 
                     turn = "bot";
                 }
@@ -187,9 +189,12 @@ namespace battleshipProject
             {
                 goto p;
             }
-            else if (tile.isShip == true && tile.wasGuessed == false)
+
+            tile.wasGuessed = true;
+            FireBotMissileAnimation(tile);
+
+            if (tile.isShip == true && tile.wasGuessed == false)
             {
-                tile.wasGuessed = true;
                 Tile t = tile.shipType.shipParts.Find(s => s.refX == tile.refX && s.refY == tile.refY);
                 t.wasGuessed = true;
 
@@ -197,38 +202,79 @@ namespace battleshipProject
             }
             else
             {
-                tile.wasGuessed = true;
+
                 missSoundPlayer.Play();
             }
 
             turn = "player";
         }
 
-        private void FireMissileAnimation(Tile tile)
+        private void FirePlayerMissileAnimation(Tile tile)
         {
-            int missleSpeed = 10;
+            float missleSpeed = 100;
 
-            int startX = this.Width / 2;
-            int startY = this.Height;
+            float startX = this.Width / 2;
+            float startY = this.Height;
 
-            int x = startX;
-            int y = startY;
+            float x = startX;
+            float y = startY;
 
             int endX = tile.x + (tile.size / 2);
             int endY = tile.y + (tile.size / 2);
 
-            double yStep = Math.Sin(endY - startY) * missleSpeed;
-            double xStep = Math.Cos(endX - startX) * missleSpeed;
+            float yStep = (endY - startY) / missleSpeed;
+            float xStep = (endX - startX) / missleSpeed;
 
-            missile = new Rectangle(Convert.ToInt32(x), Convert.ToInt32(y), 10, 10);
-
-            while (missile.X > endX && missile.Y > endY)
+            while (x > endX)
             {
-                missile.X += Convert.ToInt32(xStep);
-                missile.Y += Convert.ToInt32(yStep);
+                y += yStep;
+                x += xStep;
+
+                GetMissile(x, y, 10);
 
                 Refresh();
             }
+
+            GetMissile(0, 0, 0);
+            Refresh();
+        }
+
+        private void FireBotMissileAnimation(Tile tile)
+        {
+            float missleSpeed = 100;
+
+            float startX = this.Width / 2;
+            float startY = this.Height;
+
+            float x = startX;
+            float y = startY;
+
+            int endX = tile.x + (tile.size / 2);
+            int endY = tile.y + (tile.size / 2);
+
+            float yStep = (endY - startY) / missleSpeed;
+            float xStep = (endX - startX) / missleSpeed;
+
+            while (x < endX)
+            {
+                y += yStep;
+                x += xStep;
+
+                GetMissile(x, y, 10);
+
+                Refresh();
+            }
+
+            GetMissile(0, 0, 0);
+            Refresh();
+        }
+
+        private void GetMissile(float x, float y, float size)
+        {
+            missleData[0] = new PointF(x, y);
+            missleData[1] = new PointF(x + size, y);
+            missleData[2] = new PointF(x + size, y + size);
+            missleData[3] = new PointF(x, y + size);
         }
 
         private int CheckRemainingShips(bool checkEnemy)
@@ -371,7 +417,7 @@ namespace battleshipProject
                 e.Graphics.DrawRectangle(Form1.tilePen, t.x, t.y, t.size, t.size);
             }
 
-            e.Graphics.FillRectangle(new SolidBrush(Color.Brown), missile);
+            e.Graphics.FillPolygon(new SolidBrush(Color.Brown), missleData);
         }
     }
 }
