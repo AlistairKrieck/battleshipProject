@@ -35,7 +35,7 @@
             // titleLabel
             // 
             this.titleLabel.AutoSize = true;
-            this.titleLabel.Location = new System.Drawing.Point(193, 31);
+            this.titleLabel.Location = new System.Drawing.Point(227, 100);
             this.titleLabel.Name = "titleLabel";
             this.titleLabel.Size = new System.Drawing.Size(99, 16);
             this.titleLabel.TabIndex = 0;
@@ -43,11 +43,11 @@
             // 
             // startButton
             // 
-            this.startButton.Location = new System.Drawing.Point(242, 143);
+            this.startButton.Location = new System.Drawing.Point(230, 119);
             this.startButton.Name = "startButton";
             this.startButton.Size = new System.Drawing.Size(75, 23);
             this.startButton.TabIndex = 1;
-            this.startButton.Text = "button1";
+            this.startButton.Text = "Begin Game!";
             this.startButton.UseVisualStyleBackColor = true;
             this.startButton.Click += new System.EventHandler(this.startButton_Click);
             // 

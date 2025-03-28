@@ -32,7 +32,7 @@
             this.gameTimer = new System.Windows.Forms.Timer(this.components);
             this.enemyBoardLabel = new System.Windows.Forms.Label();
             this.playerBoard = new System.Windows.Forms.Label();
-            this.botLabel = new System.Windows.Forms.Label();
+            this.turnLabel = new System.Windows.Forms.Label();
             this.enemyShipLabel = new System.Windows.Forms.Label();
             this.playerShipLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
@@ -65,16 +65,16 @@
             this.playerBoard.TabIndex = 1;
             this.playerBoard.Text = "Your Board";
             // 
-            // botLabel
+            // turnLabel
             // 
-            this.botLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.botLabel.ForeColor = System.Drawing.Color.White;
-            this.botLabel.Location = new System.Drawing.Point(519, 46);
-            this.botLabel.Name = "botLabel";
-            this.botLabel.Size = new System.Drawing.Size(224, 32);
-            this.botLabel.TabIndex = 2;
-            this.botLabel.Text = "...";
-            this.botLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.turnLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.turnLabel.ForeColor = System.Drawing.Color.White;
+            this.turnLabel.Location = new System.Drawing.Point(519, 46);
+            this.turnLabel.Name = "turnLabel";
+            this.turnLabel.Size = new System.Drawing.Size(224, 32);
+            this.turnLabel.TabIndex = 2;
+            this.turnLabel.Text = "...";
+            this.turnLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // enemyShipLabel
             // 
@@ -105,7 +105,7 @@
             this.BackColor = System.Drawing.Color.Blue;
             this.Controls.Add(this.playerShipLabel);
             this.Controls.Add(this.enemyShipLabel);
-            this.Controls.Add(this.botLabel);
+            this.Controls.Add(this.turnLabel);
             this.Controls.Add(this.playerBoard);
             this.Controls.Add(this.enemyBoardLabel);
             this.DoubleBuffered = true;
@@ -123,7 +123,7 @@
         private System.Windows.Forms.Timer gameTimer;
         private System.Windows.Forms.Label enemyBoardLabel;
         private System.Windows.Forms.Label playerBoard;
-        private System.Windows.Forms.Label botLabel;
+        private System.Windows.Forms.Label turnLabel;
         private System.Windows.Forms.Label enemyShipLabel;
         private System.Windows.Forms.Label playerShipLabel;
     }

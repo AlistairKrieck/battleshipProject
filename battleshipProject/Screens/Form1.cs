@@ -12,10 +12,12 @@ namespace battleshipProject
 {
     public partial class Form1 : Form
     {
+        //Commonly used brushes/pens
         public static Pen tilePen = new Pen(Color.White);
         public static SolidBrush shipBrush = new SolidBrush(Color.Black);
         public static SolidBrush missBrush = new SolidBrush(Color.Gray);
 
+        //Dimentions of game boards
         public static int boardWidth = 10;
         public static int boardHeight = 10;
         public static int tileSize = 30;

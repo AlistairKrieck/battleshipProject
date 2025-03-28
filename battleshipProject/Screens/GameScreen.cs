@@ -15,9 +15,10 @@ namespace battleshipProject
 {
     public partial class GameScreen : UserControl
     {
-        //TODO Add animations
+        //Stores position of missles when fired
         PointF[] missleData = new PointF[4];
 
+        //Create both game boards
         Grid enemyBoard = new Grid();
         Grid yourBoard;
 
@@ -26,16 +27,19 @@ namespace battleshipProject
         SoundPlayer missSoundPlayer = new SoundPlayer(Properties.Resources.missSound);
         SoundPlayer explosionSoundPlayer = new SoundPlayer(Properties.Resources.explosionSound);
 
-        int boardWidth = 10;
-        int boardHeight = 10;
-        int tileSize = 30;
+        //Get board dimentions from Form1 for convenience
+        int boardWidth = Form1.boardWidth;
+        int boardHeight = Form1.boardHeight;
+        int tileSize = Form1.tileSize;
 
+        //Set number of each ship type to be placed
         int littleGuyCount = 3;
         int twoByOneCount = 3;
 
 
         Random rand = new Random();
 
+        //Allow turn to be read from other screens
         public static string turn = "player";
 
         public GameScreen()
@@ -44,6 +48,7 @@ namespace battleshipProject
             GameInit();
         }
 
+        //Places ships into enemyBoard at random positions
         public void MakeEnemyBoard()
         {
             Random rand = new Random();
@@ -110,6 +115,7 @@ namespace battleshipProject
             }
         }
 
+        //Gets ship placement from boardSetUpScreen
         public void MakePlayerBoard()
         {
             int x = (this.Width * 3 / 4) - (boardWidth * tileSize / 2);
@@ -117,14 +123,14 @@ namespace battleshipProject
 
             yourBoard = new Grid(x, y, boardWidth, boardHeight, tileSize);
 
-            //List<Tile> tiles = BoardSetupScreen.playerBoard.Tiles.FindAll(t => t.isShip == true);
-
             for (int i = 0; i < yourBoard.Tiles.Count; i++)
             {
+                //Find ship placements from BoardSetupScreen
                 if (yourBoard.Tiles[i].refX == BoardSetupScreen.playerBoard.Tiles[i].refX
                     && yourBoard.Tiles[i].refY == BoardSetupScreen.playerBoard.Tiles[i].refY
                     && BoardSetupScreen.playerBoard.Tiles[i].isShip == true)
                 {
+                    //Copy data to yourBoard
                     yourBoard.Tiles[i].isShip = BoardSetupScreen.playerBoard.Tiles[i].isShip;
                     yourBoard.Tiles[i].isShipPart = BoardSetupScreen.playerBoard.Tiles[i].isShipPart;
                     yourBoard.Tiles[i].shipType = BoardSetupScreen.playerBoard.Tiles[i].shipType;
@@ -144,131 +150,172 @@ namespace battleshipProject
         {
             if (turn == "player")
             {
+                //Find mouse position
                 int mouseX = e.X;
                 int mouseY = e.Y;
+
                 int tileSize = enemyBoard.tileSize;
                 Tile clickedTile;
 
-
+                //Find the tile that was clicked
                 clickedTile = enemyBoard.Tiles.Find(t => mouseX >= t.x && mouseX <= t.x + t.size
                             && mouseY >= t.y && mouseY <= t.y + t.size);
 
+                //Check if the tile exists and has not been guessed yet
                 if (clickedTile != null && clickedTile.wasGuessed == false)
                 {
+                    //Fire missle at clicked tile
                     FirePlayerMissileAnimation(clickedTile);
 
+                    //Tell clickedTile it was guessed
                     clickedTile.wasGuessed = true;
 
+                    //Check if guessed tile is a ship
                     if (clickedTile.isShip == true)
                     {
+                        //Play hit sound
                         explosionSoundPlayer.Play();
-
                     }
                     else
                     {
+                        //Play miss sound
                         missSoundPlayer.Play();
                     }
-
-
 
                     turn = "bot";
                 }
             }
         }
 
+        //Chooses the tile the computer will guess
         private void RunCPU()
         {
         p:
-
+            //Select a random x and y position on the created grid
             int j = rand.Next(0, boardWidth);
             int k = rand.Next(0, boardHeight);
 
+            //Find tile with those x and y positions
             Tile tile = yourBoard.Tiles.Find(t => t.refX == j && t.refY == k);
 
             if (tile.wasGuessed == true)
             {
+                //If chosen tile has already been guessed, rerandomize and check again
                 goto p;
             }
             else if (tile.isShip == true && tile.wasGuessed == false)
             {
+                //Tell chosen tile it was guessed
                 tile.wasGuessed = true;
+
+                //Fire missle at chosen tile
                 FireBotMissileAnimation(tile);
 
+                //Find tile inside of shipParts list and set it to be guessed as well
                 Tile t = tile.shipType.shipParts.Find(s => s.refX == tile.refX && s.refY == tile.refY);
                 t.wasGuessed = true;
 
+                //Play hit sound
                 explosionSoundPlayer.Play();
             }
             else
             {
+                //Tell chosen tile it was guessed
                 tile.wasGuessed = true;
+
+                //Fire missle at chosen tile
                 FireBotMissileAnimation(tile);
+
+                //Play miss sound
                 missSoundPlayer.Play();
             }
 
             turn = "player";
         }
 
+        //Updates the missleData list to move a missle from a start point to a chosen tile on the player's board
         private void FirePlayerMissileAnimation(Tile tile)
         {
             float missleSpeed = 100;
 
+            //Find starting point of missle
             float startX = this.Width / 2;
             float startY = this.Height;
 
+            //Set initial x and y values to their start points
             float x = startX;
             float y = startY;
 
+            //Find end x and y values
             int endX = tile.x + (tile.size / 2);
             int endY = tile.y + (tile.size / 2);
 
+            //Find how far the missle should travel per tick
             float yStep = (endY - startY) / missleSpeed;
             float xStep = (endX - startX) / missleSpeed;
 
             while (x > endX)
             {
+                //Update x and y values of the missle until they hit their target
                 y += yStep;
                 x += xStep;
 
+                //Update missle data
                 GetMissile(x, y, 10);
 
+                //Refresh page to draw missle
                 Refresh();
             }
 
+            //Set the missle aside for later
             GetMissile(0, 0, 0);
+
+            //Hide missle
             Refresh();
         }
 
+        //Updates the missleData list to move a missle from a start point to a chosen tile on the bot's board
         private void FireBotMissileAnimation(Tile tile)
         {
             float missleSpeed = 100;
 
+            //Find starting point of missle
             float startX = this.Width / 2;
             float startY = this.Height;
 
+            //Set initial x and y values to their start points
             float x = startX;
             float y = startY;
 
+            //Find end x and y values
             int endX = tile.x + (tile.size / 2);
             int endY = tile.y + (tile.size / 2);
 
+            //Find how far the missle should travel per tick
             float yStep = (endY - startY) / missleSpeed;
             float xStep = (endX - startX) / missleSpeed;
 
             while (x < endX)
             {
+                //Update x and y values of the missle until they hit their target
                 y += yStep;
                 x += xStep;
 
+                //Update missle data
                 GetMissile(x, y, 10);
 
+                //Refresh page to draw missle
                 Refresh();
             }
 
+            //Set the missle aside for later
             GetMissile(0, 0, 0);
+
+            //Hide missle
             Refresh();
         }
 
+        //Updates missleData list to have the coordinates of each corner
         private void GetMissile(float x, float y, float size)
         {
             missleData[0] = new PointF(x, y);
@@ -277,77 +324,95 @@ namespace battleshipProject
             missleData[3] = new PointF(x, y + size);
         }
 
+        //Finds the number of ships that both sides have sunk
         private int CheckRemainingShips(bool checkEnemy)
         {
+            //Starting number of ships
             int remainingShips = littleGuyCount + twoByOneCount;
 
+            //For player board
             if (checkEnemy == false)
             {
+                //Find all guessed tiles on the player's board
                 List<Tile> guessedTiles = yourBoard.Tiles.FindAll(t => t.wasGuessed == true && t.isShip == true);
 
+                //Check if each of those tiles were a ship
                 for (int i = 0; i < guessedTiles.Count; i++)
                 {
                     if (guessedTiles[i].shipType.shipParts.All(s => s.wasGuessed == true))
                     {
                         if (guessedTiles[i].shipType.name == "twoByOne")
                         {
+                            //Makes sure both parts of a multi-tile ship are not checked
                             guessedTiles.Remove(guessedTiles[i].shipType.shipParts[guessedTiles[i].shipType.shipParts.Count - 1]);
                         }
 
+                        //Lower remainingShips by one for each ship that has been guessed
                         remainingShips--;
                     }
                 }
             }
 
+            //For bot's board
             else
             {
+                //Find all guessed tiles on the bot's board
                 List<Tile> guessedTiles = enemyBoard.Tiles.FindAll(t => t.wasGuessed == true && t.isShip == true);
 
+                //Check if each of those tiles were a ship
                 for (int i = 0; i < guessedTiles.Count; i++)
                 {
                     if (guessedTiles[i].shipType.shipParts.All(s => s.wasGuessed == true))
                     {
                         if (guessedTiles[i].shipType.name == "twoByOne")
                         {
+                            //Makes sure both parts of a multi-tile ship are not checked
                             guessedTiles.Remove(guessedTiles[i].shipType.shipParts[guessedTiles[i].shipType.shipParts.Count - 1]);
                         }
 
+                        //Lower remainingShips by one for each ship that has been guessed
                         remainingShips--;
                     }
                 }
             }
 
+            //Return how many ships are yet to be guessed
             return remainingShips;
         }
 
         private void gameTimer_Tick(object sender, EventArgs e)
         {
+            //Find how many ships remain for player and bot
             int enemyShips = CheckRemainingShips(true);
             int playerShips = CheckRemainingShips(false);
 
+            //Write that data to labels
             enemyShipLabel.Text = $"Remaining: {enemyShips}";
             playerShipLabel.Text = $"Remaining: {playerShips}";
 
             if (turn == "bot")
             {
-                botLabel.Text = "Bot Thinking...";
+                turnLabel.Text = "Bot Thinking...";
 
                 Refresh();
 
                 Wait(1500); //Create illusion of thought
 
+                //Have bot guess a tile
                 RunCPU();
             }
             else if (turn == "player")
             {
-                botLabel.Text = "Your Move!";
+                turnLabel.Text = "Your Move!";
             }
             else
             {
+                //If turn is neither player or bot, stop the timer and go to GameOverScreen
                 gameTimer.Stop();
                 Form1.ChangeScreen(this, new GameOverScreen());
             }
 
+            //If either side has 0 ships left, set turn to the opposite winner
             if (enemyShips == 0)
             {
                 turn = "playerWon";
@@ -362,6 +427,7 @@ namespace battleshipProject
             Refresh();
         }
 
+        //Waits for a specified time using timer
         public void Wait(int waitTime)
         {
             timer.Start();
@@ -376,6 +442,7 @@ namespace battleshipProject
 
         private void GameScreen_Paint(object sender, PaintEventArgs e)
         {
+            //Paint each tile from the bot's board to screen
             foreach (var t in enemyBoard.Tiles)
             {
                 if (t.wasGuessed == true && t.isShip == false)
@@ -393,7 +460,7 @@ namespace battleshipProject
                 }
             }
 
-
+            //Paint each tile from the player's board to screen
             foreach (var t in yourBoard.Tiles)
             {
                 if (t.wasGuessed == true && t.isShip == false)
@@ -414,6 +481,7 @@ namespace battleshipProject
                 e.Graphics.DrawRectangle(Form1.tilePen, t.x, t.y, t.size, t.size);
             }
 
+            //Paint the missle on screen
             e.Graphics.FillPolygon(new SolidBrush(Color.Brown), missleData);
         }
     }
