@@ -362,10 +362,10 @@ namespace battleshipProject
                 {
                     if (guessedTiles[i].shipType.name == "twoByOne")
                     {
-                        //Makes sure both parts of a multi-tile ship are not checked
+                        //Find other parts of two by one ships and remove them from guessedTiles so they are not both checked
                         Tile sp = guessedTiles[i].shipType.shipParts.Find(t => t.refX != guessedTiles[i].refX || t.refY != guessedTiles[i].refY);
-                        guessedTiles.Remove(sp);
-
+                        int g = guessedTiles.FindIndex(t => t.refX == sp.refX || t.refY != sp.refY);
+                        guessedTiles.RemoveAt(g);
                     }
 
                     //Lower remainingShips by one for each ship that has been guessed
