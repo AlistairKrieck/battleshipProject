@@ -190,7 +190,6 @@ namespace battleshipProject
         //Chooses the tile the computer will guess
         private void RunCPU()
         {
-        p:
             //Select a random x and y position on the created grid
             int j = rand.Next(0, boardWidth);
             int k = rand.Next(0, boardHeight);
@@ -198,12 +197,16 @@ namespace battleshipProject
             //Find tile with those x and y positions
             Tile tile = yourBoard.Tiles.Find(t => t.refX == j && t.refY == k);
 
-            if (tile.wasGuessed == true)
+            //If chosen tile has already been guessed, rerandomize and check again
+            while (tile.wasGuessed == true)
             {
-                //If chosen tile has already been guessed, rerandomize and check again
-                goto p;
+                j = rand.Next(0, boardWidth);
+                k = rand.Next(0, boardHeight);
+
+                tile = yourBoard.Tiles.Find(t => t.refX == j && t.refY == k);
             }
-            else if (tile.isShip == true && tile.wasGuessed == false)
+
+            if (tile.isShip == true && tile.wasGuessed == false)
             {
                 //Tell chosen tile it was guessed
                 tile.wasGuessed = true;
@@ -218,7 +221,7 @@ namespace battleshipProject
                 //Play hit sound
                 explosionSoundPlayer.Play();
             }
-            else
+            else if (tile.isShip == false && tile.wasGuessed == false)
             {
                 //Tell chosen tile it was guessed
                 tile.wasGuessed = true;
@@ -329,54 +332,47 @@ namespace battleshipProject
         {
             //Starting number of ships
             int remainingShips = littleGuyCount + twoByOneCount;
+            List<Tile> guessedTiles;
 
             //For player board
             if (checkEnemy == false)
             {
                 //Find all guessed tiles on the player's board
-                List<Tile> guessedTiles = yourBoard.Tiles.FindAll(t => t.wasGuessed == true && t.isShip == true);
-
-                //Check if each of those tiles were a ship
-                for (int i = 0; i < guessedTiles.Count; i++)
-                {
-                    if (guessedTiles[i].shipType.shipParts.All(s => s.wasGuessed == true))
-                    {
-                        if (guessedTiles[i].shipType.name == "twoByOne")
-                        {
-                            //Makes sure both parts of a multi-tile ship are not checked
-                            guessedTiles.Remove(guessedTiles[i].shipType.shipParts[guessedTiles[i].shipType.shipParts.Count - 1]);
-                        }
-
-                        //Lower remainingShips by one for each ship that has been guessed
-                        remainingShips--;
-                    }
-                }
+                guessedTiles = yourBoard.Tiles.FindAll(t => t.wasGuessed == true && t.isShip == true);
             }
-
             //For bot's board
             else
             {
                 //Find all guessed tiles on the bot's board
-                List<Tile> guessedTiles = enemyBoard.Tiles.FindAll(t => t.wasGuessed == true && t.isShip == true);
+                guessedTiles = enemyBoard.Tiles.FindAll(t => t.wasGuessed == true && t.isShip == true);
+            }
 
-                //Check if each of those tiles were a ship
-                for (int i = 0; i < guessedTiles.Count; i++)
+            remainingShips = GetRemainingShips(remainingShips, guessedTiles);
+
+            //Return how many ships are yet to be guessed
+            return remainingShips;
+        }
+
+        private static int GetRemainingShips(int remainingShips, List<Tile> guessedTiles)
+        {
+            //Check if each of those tiles were a ship
+            for (int i = 0; i < guessedTiles.Count; i++)
+            {
+                if (guessedTiles[i].shipType.shipParts.All(s => s.wasGuessed == true))
                 {
-                    if (guessedTiles[i].shipType.shipParts.All(s => s.wasGuessed == true))
+                    if (guessedTiles[i].shipType.name == "twoByOne")
                     {
-                        if (guessedTiles[i].shipType.name == "twoByOne")
-                        {
-                            //Makes sure both parts of a multi-tile ship are not checked
-                            guessedTiles.Remove(guessedTiles[i].shipType.shipParts[guessedTiles[i].shipType.shipParts.Count - 1]);
-                        }
+                        //Makes sure both parts of a multi-tile ship are not checked
+                        Tile sp = guessedTiles[i].shipType.shipParts.Find(t => t.refX != guessedTiles[i].refX || t.refY != guessedTiles[i].refY);
+                        guessedTiles.Remove(sp);
 
-                        //Lower remainingShips by one for each ship that has been guessed
-                        remainingShips--;
                     }
+
+                    //Lower remainingShips by one for each ship that has been guessed
+                    remainingShips--;
                 }
             }
 
-            //Return how many ships are yet to be guessed
             return remainingShips;
         }
 

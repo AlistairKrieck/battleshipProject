@@ -29,6 +29,7 @@ namespace battleshipProject
             ChangeScreen(this, new MenuScreen());
         }
 
+        //For swapping active user controls
         public static void ChangeScreen(object sender, UserControl next)
         {
             Form f;
