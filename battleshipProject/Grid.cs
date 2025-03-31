@@ -18,6 +18,7 @@ namespace battleshipProject
 
         public Grid(int _x, int _y, int _width, int _height, int _tileSize)
         {
+            //Get dimentions of grid
             x = _x;
             y = _y;
             Tiles = new List<Tile>();
@@ -25,6 +26,7 @@ namespace battleshipProject
             height = _height;
             tileSize = _tileSize;
 
+            //Create each tile in the grid
             for (int j = 0; j < height; j++)
             {
                 for (int i = 0; i < width; i++)

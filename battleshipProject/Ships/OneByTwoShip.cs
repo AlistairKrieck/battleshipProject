@@ -11,9 +11,12 @@ namespace battleshipProject
     {
         public OneByTwoShip()
         {
+            //Define dimentions and name of "Two by One" ships
             name = "twoByOne";
             xSize = 2;
             ySize = 1;
+
+            //Define colour of "Two by One" ships when painted
             shipBrush = new SolidBrush(Color.Red);
             hitBrush = new SolidBrush(Color.DarkRed);
         }

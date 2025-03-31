@@ -9,6 +9,7 @@ namespace battleshipProject
 {
     public class Ship
     {
+        //Variables for all ship objects
         public string name;
         public int xSize, ySize;
         public SolidBrush shipBrush;
@@ -16,6 +17,7 @@ namespace battleshipProject
         public List<Tile> shipParts = new List<Tile>();
         public int orientation = 0;
 
+        //Changes the "orientation" value by a given modifier
         public void ChangeOrientation(int modifier)
         {
             orientation += modifier;
@@ -31,6 +33,7 @@ namespace battleshipProject
             }
         }
 
+        //Moves ship parts to new position
         public void RotateShip(Tile checkTile, Grid board)
         {
             if (GetOrientation(checkTile, 1, board).isShip == false)
@@ -43,6 +46,7 @@ namespace battleshipProject
             }
         }
 
+        //Finds which tile the ships parts are at at a given orientation, relative to its current
         public static Tile GetOrientation(Tile checkTile, int futureCheck, Grid board)
         {
             Tile shipPart = new Tile();
@@ -94,6 +98,7 @@ namespace battleshipProject
             return shipPart;
         }
 
+        //Sets a given tile to be a ships part
         public void SetShipParts(Tile checkTile, Grid board)
         {
             GetOrientation(checkTile, 0, board).isShipPart = true;
@@ -101,6 +106,7 @@ namespace battleshipProject
             GetOrientation(checkTile, 0, board).shipType = checkTile.shipType;
         }
 
+        //Removes ship part from a ship
         public void RemoveShipParts(Tile checkTile, Grid board)
         {
             Tile shipPart = GetOrientation(checkTile, 0, board);
