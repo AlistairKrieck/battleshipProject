@@ -425,6 +425,7 @@ namespace battleshipProject
             {
                 DrawTile(e, t);
 
+                //Show player where their own ships are
                 if (t.wasGuessed == false && t.isShip == true)
                 {
                     e.Graphics.FillRectangle(Form1.shipBrush, t.x, t.y, t.size, t.size);
