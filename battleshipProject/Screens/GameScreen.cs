@@ -24,6 +24,7 @@ namespace battleshipProject
 
         Stopwatch timer = new Stopwatch();
 
+        //Create soundplayers for sfx
         SoundPlayer missSoundPlayer = new SoundPlayer(Properties.Resources.missSound);
         SoundPlayer explosionSoundPlayer = new SoundPlayer(Properties.Resources.explosionSound);
 
@@ -239,6 +240,7 @@ namespace battleshipProject
         //Updates the missleData list to move a missle from a start point to a chosen tile on the player's board
         private void FirePlayerMissileAnimation(Tile tile)
         {
+            //Define how many frames it will take for the missle to reach its target
             float missleSpeed = 100;
 
             //Find starting point of missle
@@ -415,44 +417,38 @@ namespace battleshipProject
             //Paint each tile from the bot's board to screen
             foreach (var t in enemyBoard.Tiles)
             {
-                if (t.wasGuessed == true && t.isShip == false)
-                {
-                    e.Graphics.FillRectangle(Form1.missBrush, t.x, t.y, t.size, t.size);
-                }
-                else if (t.wasGuessed == true && t.isShip == true)
-                {
-                    e.Graphics.FillRectangle(t.shipType.hitBrush, t.x, t.y, t.size, t.size);
-                }
-
-                else
-                {
-                    e.Graphics.DrawRectangle(Form1.tilePen, t.x, t.y, t.size, t.size);
-                }
+                DrawTile(e, t);
             }
 
             //Paint each tile from the player's board to screen
             foreach (var t in yourBoard.Tiles)
             {
-                if (t.wasGuessed == true && t.isShip == false)
-                {
-                    e.Graphics.FillRectangle(Form1.missBrush, t.x, t.y, t.size, t.size);
-                }
+                DrawTile(e, t);
 
-                else if (t.wasGuessed == true && t.isShip == true)
-                {
-                    e.Graphics.FillRectangle(t.shipType.hitBrush, t.x, t.y, t.size, t.size);
-                }
-
-                else if (t.wasGuessed == false && t.isShip == true)
+                if (t.wasGuessed == false && t.isShip == true)
                 {
                     e.Graphics.FillRectangle(Form1.shipBrush, t.x, t.y, t.size, t.size);
                 }
-
-                e.Graphics.DrawRectangle(Form1.tilePen, t.x, t.y, t.size, t.size);
             }
 
             //Paint the missle on screen
             e.Graphics.FillPolygon(new SolidBrush(Color.Brown), missleData);
+        }
+
+        private static void DrawTile(PaintEventArgs e, Tile t)
+        {
+            if (t.wasGuessed == true && t.isShip == false)
+            {
+                e.Graphics.FillRectangle(Form1.missBrush, t.x, t.y, t.size, t.size);
+            }
+
+            else if (t.wasGuessed == true && t.isShip == true)
+            {
+                e.Graphics.FillRectangle(t.shipType.hitBrush, t.x, t.y, t.size, t.size);
+            }
+
+
+            e.Graphics.DrawRectangle(Form1.tilePen, t.x, t.y, t.size, t.size);
         }
     }
 }
