@@ -332,47 +332,21 @@ namespace battleshipProject
         {
             //Starting number of ships
             int remainingShips = littleGuyCount + twoByOneCount;
-            List<Tile> guessedTiles;
 
             //For player board
             if (checkEnemy == false)
             {
                 //Find all guessed tiles on the player's board
-                guessedTiles = yourBoard.Tiles.FindAll(t => t.wasGuessed == true && t.isShip == true);
+                remainingShips = yourBoard.GetRemainingShips(remainingShips);
             }
             //For bot's board
             else
             {
                 //Find all guessed tiles on the bot's board
-                guessedTiles = enemyBoard.Tiles.FindAll(t => t.wasGuessed == true && t.isShip == true);
+                remainingShips = enemyBoard.GetRemainingShips(remainingShips);
             }
-
-            remainingShips = GetRemainingShips(remainingShips, guessedTiles);
 
             //Return how many ships are yet to be guessed
-            return remainingShips;
-        }
-
-        private static int GetRemainingShips(int remainingShips, List<Tile> guessedTiles)
-        {
-            //Check if each of those tiles were a ship
-            for (int i = 0; i < guessedTiles.Count; i++)
-            {
-                if (guessedTiles[i].shipType.shipParts.All(s => s.wasGuessed == true))
-                {
-                    if (guessedTiles[i].shipType.name == "twoByOne")
-                    {
-                        //Find other parts of two by one ships and remove them from guessedTiles so they are not both checked
-                        Tile sp = guessedTiles[i].shipType.shipParts.Find(t => t.refX != guessedTiles[i].refX || t.refY != guessedTiles[i].refY);
-                        int g = guessedTiles.FindIndex(t => t.refX == sp.refX || t.refY != sp.refY);
-                        guessedTiles.RemoveAt(g);
-                    }
-
-                    //Lower remainingShips by one for each ship that has been guessed
-                    remainingShips--;
-                }
-            }
-
             return remainingShips;
         }
 
